@@ -76,18 +76,38 @@ class MainActivity : AppCompatActivity() {
 
         // runBlocking :
         /*
-        This is a block also helps us to do async activities but this actually blocks the main thread. So why to use them ?
+        This is a block also helps us to do async activities but this actually blocks the main thread. So, why to use them ?
         -> 1: We need to call some suspend func like delay() synchronously  2: Junit Testing
          */
 
         runBlocking {
             //This also launches Coroutines
             delay(5000L)
+            Thread.sleep(1000L)   //Destroys Thread Permanently
 
         }
 
+        //Jobs, waiting and cancellation
+        /*
+        A coroutine returns a job
+         */
+
+        val job = GlobalScope.launch(Dispatchers.Default) {
+
+            repeat(5) {
+                if (isActive) {
+                    Log.d(TAG, "Just Repeating...")
+                }
+            }
+        }
+        runBlocking {
+            job.join() //waiting for the job to be complete
+//                job.cancel() //canceling job
+            Log.d(TAG, "Finally Done Repeating")
+        }
     }
 
+    //Dummy network call
     suspend fun networkCall(): String {
         delay(5000L)     //delay() is also a suspendable func so it cannot be used anywhere outside
         return "Fetched Data"
